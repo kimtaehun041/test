@@ -1,34 +1,360 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GitHub Pages 테스트</title>
+  <title>Claude Code</title>
   <style>
+    :root {
+      --orange: #D97757;
+      --orange-light: #E8956D;
+      --orange-glow: rgba(217, 119, 87, 0.15);
+      --bg: #0D0D0D;
+      --bg-card: #141414;
+      --bg-surface: #1A1A1A;
+      --border: #2A2A2A;
+      --text: #F5F0EB;
+      --text-muted: #8A8480;
+      --code-bg: #111111;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
-      font-family: sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* NAV */
+    nav {
       display: flex;
-      justify-content: center;
       align-items: center;
-      height: 100vh;
-      margin: 0;
-      background: #f0f4f8;
+      justify-content: space-between;
+      padding: 1.25rem 3rem;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: rgba(13,13,13,0.85);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-weight: 600;
+      font-size: 1.05rem;
+      letter-spacing: -0.01em;
+    }
+    .logo-icon {
+      width: 28px;
+      height: 28px;
+      background: var(--orange);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: white;
+      font-weight: 700;
+    }
+    nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      transition: color 0.2s;
+    }
+    nav a:hover { color: var(--text); }
+    .nav-links { display: flex; gap: 2rem; }
+
+    /* HERO */
+    .hero {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 7rem 2rem 5rem;
+      text-align: center;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--orange-glow);
+      border: 1px solid rgba(217,119,87,0.3);
+      color: var(--orange-light);
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 0.35rem 0.85rem;
+      border-radius: 999px;
+      margin-bottom: 2rem;
+      letter-spacing: 0.02em;
+    }
+    .badge::before { content: "●"; font-size: 0.6rem; }
+
+    h1 {
+      font-size: clamp(2.4rem, 5vw, 3.6rem);
+      font-weight: 700;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.5rem;
+    }
+    h1 span { color: var(--orange); }
+
+    .subtitle {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      max-width: 560px;
+      margin: 0 auto 2.5rem;
+    }
+
+    .cta-group {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn {
+      padding: 0.7rem 1.6rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+      border: none;
+    }
+    .btn-primary {
+      background: var(--orange);
+      color: white;
+    }
+    .btn-primary:hover { background: var(--orange-light); transform: translateY(-1px); }
+    .btn-secondary {
+      background: var(--bg-surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { border-color: var(--orange); color: var(--orange); }
+
+    /* TERMINAL */
+    .terminal-wrapper {
+      max-width: 680px;
+      margin: 5rem auto;
+      padding: 0 2rem;
+    }
+    .terminal {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03);
+    }
+    .terminal-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.85rem 1.2rem;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot.red { background: #FF5F57; }
+    .dot.yellow { background: #FFBD2E; }
+    .dot.green { background: #28C840; }
+    .terminal-title {
+      margin-left: auto;
+      margin-right: auto;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .terminal-body {
+      padding: 1.5rem 1.75rem;
+      font-family: "SF Mono", "Fira Code", monospace;
+      font-size: 0.85rem;
+      line-height: 1.8;
+    }
+    .line { display: flex; gap: 0.75rem; }
+    .prompt { color: var(--orange); user-select: none; }
+    .cmd { color: #C9D1D9; }
+    .output { color: var(--text-muted); padding-left: 1.5rem; }
+    .output.highlight { color: var(--orange-light); }
+    .cursor {
+      display: inline-block;
+      width: 8px;
+      height: 1em;
+      background: var(--orange);
+      vertical-align: text-bottom;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* FEATURES */
+    .features {
+      max-width: 960px;
+      margin: 2rem auto 6rem;
+      padding: 0 2rem;
+    }
+    .section-label {
+      text-align: center;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: var(--orange);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+    .section-title {
+      text-align: center;
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 3.5rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.25rem;
     }
     .card {
-      text-align: center;
-      background: white;
-      padding: 2rem 3rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
       border-radius: 12px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      padding: 1.75rem;
+      transition: border-color 0.2s, transform 0.2s;
     }
-    h1 { color: #2d6a4f; }
-    p { color: #555; }
+    .card:hover {
+      border-color: rgba(217,119,87,0.4);
+      transform: translateY(-2px);
+    }
+    .card-icon {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.01em;
+    }
+    .card p {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    footer p { font-size: 0.8rem; color: var(--text-muted); }
+    footer span { color: var(--orange); }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>GitHub Pages 배포 성공!</h1>
-    <p>이 페이지는 GitHub Pages로 배포된 테스트 페이지입니다.</p>
+
+  <nav>
+    <div class="logo">
+      <div class="logo-icon">C</div>
+      Claude Code
+    </div>
+    <div class="nav-links">
+      <a href="#">Docs</a>
+      <a href="#">GitHub</a>
+      <a href="#">Blog</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="badge">Now available · Claude Sonnet 4.6</div>
+    <h1>Code smarter with<br><span>Claude Code</span></h1>
+    <p class="subtitle">
+      An agentic coding tool that lives in your terminal. Claude Code understands your entire codebase and gets real work done — autonomously.
+    </p>
+    <div class="cta-group">
+      <a class="btn btn-primary" href="#">Get Started</a>
+      <a class="btn btn-secondary" href="#">View on GitHub</a>
+    </div>
+  </section>
+
+  <div class="terminal-wrapper">
+    <div class="terminal">
+      <div class="terminal-header">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <span class="terminal-title">bash</span>
+      </div>
+      <div class="terminal-body">
+        <div class="line">
+          <span class="prompt">$</span>
+          <span class="cmd">npm install -g @anthropic-ai/claude-code</span>
+        </div>
+        <div class="output">added 1 package in 2s</div>
+        <br>
+        <div class="line">
+          <span class="prompt">$</span>
+          <span class="cmd">claude</span>
+        </div>
+        <div class="output highlight">✓ Claude Code ready</div>
+        <div class="output">? How can I help you today?</div>
+        <br>
+        <div class="line">
+          <span class="prompt">&gt;</span>
+          <span class="cmd">Fix the authentication bug and add unit tests<span class="cursor"></span></span>
+        </div>
+      </div>
+    </div>
   </div>
+
+  <section class="features">
+    <p class="section-label">Features</p>
+    <h2 class="section-title">Everything you need to ship faster</h2>
+    <div class="grid">
+      <div class="card">
+        <div class="card-icon">⚡</div>
+        <h3>Agentic by default</h3>
+        <p>Claude Code autonomously reads, edits, and runs code across your entire repository — no copy-paste needed.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔍</div>
+        <h3>Full codebase context</h3>
+        <p>Understands your project structure, imports, and conventions without needing to be told where to look.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🛠️</div>
+        <h3>Real tool use</h3>
+        <p>Runs tests, installs packages, searches files, and executes shell commands to get the job done.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔒</div>
+        <h3>Safe & transparent</h3>
+        <p>Every action is shown before execution. You stay in control with fine-grained permission settings.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🤝</div>
+        <h3>MCP integrations</h3>
+        <p>Connect to databases, APIs, and services via the Model Context Protocol for extended capabilities.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🚀</div>
+        <h3>CI/CD ready</h3>
+        <p>Run Claude Code headlessly in GitHub Actions and automate reviews, fixes, and deployments.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Built with <span>♥</span> using Claude Code</p>
+    <p>© 2026 Anthropic · Deployed via GitHub Actions</p>
+  </footer>
+
 </body>
 </html>
